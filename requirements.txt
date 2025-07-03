@@ -1,0 +1,11 @@
+PyJWT
+Requests
+fastapi
+uvicorn
+pytest
+python-dotenv
+python-jose
+pytest-cov
+httpx
+beautifulsoup4
+lxml
