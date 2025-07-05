@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.orm import Session
 from src.database import Base, engine, get_db
 import src.crud, src.schemas
-from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.responses import FileResponse, JSONResponse
 import os
 import shutil
@@ -11,11 +10,11 @@ from typing import List
 import zipfile
 import tempfile
 
-
-
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/users/", response_model=src.schemas.UserOut)
 def create_user(user: src.schemas.UserCreate, db: Session = Depends(get_db)):
@@ -30,9 +29,6 @@ def read_user(user_id: str, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
-
-UPLOAD_DIR = "uploaded_photos"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/photos/{user_id}")
 async def upload_photos(user_id: str, files: List[UploadFile] = File(...)):
